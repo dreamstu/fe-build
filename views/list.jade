@@ -1,0 +1,180 @@
+extends layout
+
+block append style
+  style.
+    #box{
+      display:inline-block;
+    }
+    .item .arrow-up {
+      width: 0px;
+      height: 0px;
+      border-left: 20px solid transparent;
+      border-bottom: 20px solid #ff684d;
+      font-size: 0px;
+      line-height: 0px;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+    }
+    .item .arrow-text{
+      position: absolute;
+      right: 2px;
+      height: 20px;
+      z-index: 1;
+      top: 41px;
+      color:#fff;
+    }
+    .item.active{
+      border-color:#ff684d;
+    }
+    .item {
+      display:inline-block;
+      width:100px;
+      height:100px;
+      line-height:100px;
+      background:#eee;
+      margin:5px;
+      text-align:center;
+      border:1px solid #eee;
+      position: relative;
+      cursor:pointer;
+    }
+    .item:hover{
+      background:#ddd;
+      border:1px solid #ff684d;
+    }
+    .item:hover .arrow-text{
+      display:block;
+    }
+    .item:hover .arrow-up{
+      display:block;
+    }
+    #message {
+        font-size:14px;
+        line-height:20px;
+        width: 100%;
+        height: 600px;
+    }
+
+
+block content
+  .row.marketing
+    p
+      span.glyphicon.glyphicon-th-list
+      |  可构建的组件
+    div#box
+      each val,index in list
+        .item(data-name='#{val}')
+          | #{val}
+          span.arrow-up.hidden
+          span.arrow-text.hidden √
+    p
+      div.checkbox
+        .checkbox
+          label
+            input#checkAll(type='checkbox')
+            |  全选
+
+      button#startbtn.btn.btn-primary
+        span.glyphicon.glyphicon-heart
+        |   开始构建
+    p
+      span.glyphicon.glyphicon-eye-open
+      |  日志
+    pre#message
+
+block append script
+  script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/socket/chat.js")
+  script(src='/javascripts/ace/ace.js')
+  script.
+   $(function(){
+      var box = $('#box');
+      var startbtn = $('#startbtn');
+      var checkAll = $('#checkAll');
+      var socket = window.socket;
+      var all = "#{list}".split(',');
+
+      box.on('click','.item',function(){
+        var self = $(this);
+        if(self.hasClass('active')){
+          self.removeClass('active').find('span').addClass('hidden');
+        }else{
+          self.addClass('active').find('span').removeClass('hidden');
+        }
+      });
+
+      function getChecked(){
+        var targets = box.find('.item.active');
+        var obj = [];
+        $.each(targets,function(idx,target){
+          var name = $(target).data('name');
+          obj.push(name);
+        });
+        return obj;
+      }
+      checkAll.on('change',function(){
+        var targets = box.find('.item');
+        if($(this).is(':checked')){
+          $.each(targets,function(idx,target){
+            $(target).addClass('active').find('span').removeClass('hidden');
+          });
+        }else{
+          $.each(targets,function(idx,target){
+            $(target).removeClass('active').find('span').addClass('hidden');
+          });
+        }
+      });
+      startbtn.on('click',function(){
+        var gallerys = getChecked();
+        if(gallerys.length<=0){
+          dialog.show({
+            msg:'哥哥，请选择需要构建的组件！'
+          });
+          return;
+        }
+        editor.setValue('');
+        socket.emit('start',{
+          path:'#{path}',
+          dirs:gallerys,
+          all:all,
+          cfg:{
+            skipError:true
+          }
+        });
+      });
+
+
+      var editor = ace.edit("message");
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode('ace/mode/markdown');
+            editor.getSession().setUseWrapMode(true);//自动换行
+            //editor.setReadOnly(true);
+            //editor.setHighlightActiveLine(false);
+            editor.setShowPrintMargin(false);
+
+      socket.on('init', function(log) {
+        editor.setValue('');
+        outLog(log,true);
+      });
+
+      socket.on('message', function(log) {
+        outLog(log,false);
+      });
+
+      socket.on('build-end',function(log){
+        outLog(log,true);
+      });
+
+      function outLog(log,end){
+        editor.insert("\n"+log+"\r"+(end?'\n':''));
+        //- Go to last line
+        editor.gotoLine(editor.session.getLength());
+      }
+
+      window.onReload = function(){
+        socket.emit('disconnect');
+      }
+
+   });
+

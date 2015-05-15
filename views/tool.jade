@@ -1,0 +1,97 @@
+extends layout
+
+block append style
+  style.
+    #config {
+        font-size:20px;
+        position: relative;
+        width: 100%;
+        height: 600px;
+    }
+
+block content
+  .row.marketing
+        form#form
+          .form-group
+            label(for="project")
+              span.glyphicon.glyphicon-cloud
+              项目
+            select.form-control(id='project' name='project')
+              option(value='') 请选择项目
+              option(value='crm-mobile') crm-mobile
+            span.help-block 选择要构建的项目
+          .form-group
+            label(for="config")
+              span.glyphicon.glyphicon-file
+              配置文件
+            pre#config.form-control
+            textarea#hideConf.hidden(name="config", cols="30", rows="10")
+            span.help-block 配置文件内容
+          button#submitbtn.btn.btn-primary(type='button')
+            下一步
+            span.glyphicon.glyphicon-arrow-right
+      .col-lg-6
+
+block append script
+  script(src='/javascripts/ace/ace.js')
+  script.
+   $(function(){
+      var editor = ace.edit("config");
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode('ace/mode/javascript');
+
+      var project = $('#project');
+      var config = $('#config');
+      var btn = $('#submitbtn');
+        project.on('change',function(){
+          var pro = $.trim($(this).val());
+          if(pro){
+            getConfigText(pro);
+          }
+        });
+
+      function getConfigText(project){
+        $.ajax({
+          url:'/query/cfg/'+project,
+          success:function(data){
+            if(data.code && data.code>0){
+              dialog.show({
+                msg:data.msg
+              });
+            }else{
+              editor.setValue(data);
+            }
+          }
+        });
+      }
+
+      btn.on('click',function(){
+        var conf = $.trim(editor.getValue());
+        var name = $.trim(project.val());
+        if(conf==''){
+          dialog.show({
+            msg:'配置内容不能为空'
+          });
+          return;
+        }
+        if(name==''){
+          dialog.show({
+            msg:'请选择项目以加载配置文件'
+          });
+          return;
+        }
+
+        $.ajax({
+          url:'/cli/begin',
+          type:'POST',
+          data:('project='+name+'&config='+conf).replace(/\+/g, '%2B'),
+          dataType:'json',
+          success:function(data){
+            window.location.href='/cli/list/'+data.project;
+          }
+        });
+
+      });
+
+    });
+

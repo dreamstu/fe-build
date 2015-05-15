@@ -1,0 +1,52 @@
+extends layout
+
+block append style
+  style.
+    #box{
+      display:inline-block;
+    }
+    #message {
+        font-size:14px;
+        line-height:20px;
+        width: 100%;
+        height: 600px;
+    }
+
+
+block content
+  .row.marketing
+    form#form(action="/config/update" method="POST")
+      p
+        span.glyphicon.glyphicon-eye-open
+        |  现有配置
+      pre#message #{config}
+      textarea#config.hidden(name="config", cols="30", rows="10")
+      button#startbtn.btn.btn-primary
+          span.glyphicon.glyphicon-heart
+          |   保存配置
+
+block append script
+  script(src='/javascripts/ace/ace.js')
+  script.
+   $(function(){
+      var form = $('#form');
+      var textarea = $('#config');
+      var editor = ace.edit("message");
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode('ace/mode/javascript');
+            editor.getSession().setUseWrapMode(true);//自动换行
+            editor.setShowPrintMargin(false);
+      form.on('submit',function(){
+        var config = $.trim(editor.getValue());
+        if(config.length>0){
+          textarea.val(config);
+          return true;
+        }else{
+          dialog.show({
+            msg:'哥哥，请不要提交空内容啊！'
+          });
+         return false;
+        }
+      });
+   });
+

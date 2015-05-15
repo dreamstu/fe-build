@@ -1,0 +1,27 @@
+include includes/head
+    block style
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .container
+      include includes/header
+      if code>0
+        .alert.alert-warning.alert-dismissible.fade.in(role='alert')
+              button.close(type='button', data-dismiss='alert', aria-label='Close')
+                span(aria-hidden='true') ×
+              strong 错误消息 #{code}
+              |  #{msg}
+      else if code==0 && msg!="" && msg!=undefined
+        .alert.alert-success.alert-dismissible.fade.in(role='alert')
+              button.close(type='button', data-dismiss='alert', aria-label='Close')
+                span(aria-hidden='true') ×
+              strong 成功消息
+              |  #{msg}
+      block content
+      block script
+        script(src='/javascripts/jquery/dist/jquery.js')
+        script(src='/javascripts/bootstrap/dist/js/bootstrap.js')
+        script(src='/javascripts/dialog/index.js')
+        include includes/foot
+        script.
+          var $msg = $('#msg');
+          var dialog = new $.dialog;
