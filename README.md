@@ -1,6 +1,9 @@
 #febuild
   
   自动化时代已经到来
+## run
+
+`DEBUG=feapp:* ./bin/www`
 
 ## 基本
 
