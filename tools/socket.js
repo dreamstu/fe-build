@@ -1,4 +1,5 @@
 var path = require('path');
+var appcfg = require('../configs/app-cfg');
 var getColor=function(){
   var colors = ['aliceblue','antiquewhite','aqua','aquamarine','pink','red','green',
                 'orange','blue','blueviolet','brown','burlywood','cadetblue'];
@@ -10,7 +11,7 @@ var getTime=function(){
 };
 
 function getRealPath(project){
-  return path.join(__dirname,'..','tmp',project)+'.js';
+  return path.join(__dirname,'..',appcfg.procfg,appcfg.procfgs[project],project)+'.js';
 }
 
 module.exports = {

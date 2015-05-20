@@ -59,7 +59,6 @@ var register = function(quick){
      * @returns {*}
      */
     _.pkg = function(key, file){
-      console.log(_.fs.readFileSync(file));
         var result;
         key = key || '';
         file = file || 'package.json';

@@ -123,6 +123,7 @@ module.exports = function(socket) {
           }
           print(quick.log.debug,'> 待构建队列：'+$dirs.join(', '));
           print(quick.log.debug,'## 即将开始，共 `'+$dirs.length+'` 个组件');
+          print(quick.log.debug,$dirs.length,'build-length');//通知客户端总共要构建的数量
           exports.run($dirs);
       } else {
           print(quick.log.debug,'> 没有可以构建的组件');
@@ -141,6 +142,7 @@ module.exports = function(socket) {
             }
             $isStart = true;
             name = dirs.shift();
+            print(quick.log.debug,dirs.length,'build-number');//通知客户端剩余数量
             buildpath = path.join(__dirname,'..','..','tmp','build');
             currentpath = path.join(buildpath,name);
             pkgpath = path.join(currentpath,'package.json');

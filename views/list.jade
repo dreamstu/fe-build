@@ -21,7 +21,7 @@ block append style
       right: 2px;
       height: 20px;
       z-index: 1;
-      top: 41px;
+      top: 5px;
       color:#fff;
     }
     .item.active{
@@ -29,9 +29,9 @@ block append style
     }
     .item {
       display:inline-block;
-      width:100px;
-      height:100px;
-      line-height:100px;
+      width:176px;
+      height:25px;
+      line-height:25px;
       background:#eee;
       margin:5px;
       text-align:center;
@@ -53,7 +53,7 @@ block append style
         font-size:14px;
         line-height:20px;
         width: 100%;
-        height: 600px;
+        height: 400px;
     }
 
 
@@ -80,6 +80,12 @@ block content
         |   开始构建
     p
       span.glyphicon.glyphicon-eye-open
+      |  进度
+      .progress
+        .progress-bar#progress-bar.progress-bar-striped(role='progressbar', aria-valuenow='100', aria-valuemin='0', aria-valuemax='100', style='width: 0%;')
+          span.text 0% Complete
+    p
+      span.glyphicon.glyphicon-info-sign
       |  日志
     pre#message
 
@@ -92,6 +98,8 @@ block append script
       var box = $('#box');
       var startbtn = $('#startbtn');
       var checkAll = $('#checkAll');
+      var bar = $('#progress-bar');
+      var barText = bar.find('.text');
       var socket = window.socket;
       var all = "#{list}".split(',');
 
@@ -164,6 +172,22 @@ block append script
 
       socket.on('build-end',function(log){
         outLog(log,true);
+      });
+
+      //设置总进度
+      socket.on('build-length',function(length){
+        bar.attr('aria-valuenow',length).attr('aria-valuemax',length).removeClass('progress-bar-success');
+      });
+      //更新当前进度
+      socket.on('build-number',function(length){
+        var total = parseInt(bar.attr('aria-valuenow'));
+        var progress = total-length;
+        var percent = Math.ceil((progress/total)*100);
+        bar.css({"width":percent+"%"});
+        barText.text(percent+'%');
+        if(percent>=100){
+          bar.addClass('progress-bar-success');
+        }
       });
 
       function outLog(log,end){

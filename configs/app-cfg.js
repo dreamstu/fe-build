@@ -6,6 +6,14 @@ module.exports = {
       out:'tmp/Gruntfile.js'
     }
   },
+  //配置文件夹
   configs:'configs',
-  temp:'tmp'
+  //临时文件夹
+  temp:'tmp',
+  //构建配置临时文件夹
+  procfg:'tmp/procfg',
+  //项目对应的文件夹
+  procfgs:{
+    'crm-mobile':'crm'
+  }
 }

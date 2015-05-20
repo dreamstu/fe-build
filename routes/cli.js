@@ -9,25 +9,27 @@ var appcfg = require('../configs/app-cfg');
 router.post('/begin', function(req, res, next) {
   var project = req.body.project;
   var config = req.body.config;
-  var current = String(new Date().getTime());
-  project = project+'_'+current;
-  var _path = path.join(__dirname,'..',appcfg.temp,project)+'.js';
+  var _path = path.join(__dirname,'..',appcfg.procfg,appcfg.procfgs[project],project)+'.js';
+  var _dirname = path.dirname(_path);
+  if(!fs.existsSync(_dirname)){
+    fs.mkdirSync(_dirname);
+  }
   fs.writeFile(_path,config,function(err) {
     if (err) console.log(err);
     console.log('>> current config file path:',project);
-    res.send({"project":project});
+    res.send({"config":project});
   });
 });
 
-function getRealPath(project){
-  return path.join(__dirname,'..',appcfg.temp,project)+'.js';
+function getRealPath(config){
+  return path.join(__dirname,'..',appcfg.procfg,appcfg.procfgs[config],config)+'.js';
 }
 
-router.get('/list/:configpath', function(req, res, next) {
-  var configpath = getRealPath(req.params.configpath);
+router.get('/list/:config', function(req, res, next) {
+  var configpath = getRealPath(req.params.config);
   build.setConfig(configpath);
   var list = build.start();
-  res.render('list', { title: '构建-前端自动化',list:list,path:req.params.configpath });
+  res.render('list', { title: '构建-前端自动化',list:list,path:req.params.config });
 });
 
 module.exports = router;
