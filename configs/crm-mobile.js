@@ -6,10 +6,10 @@ module.exports = function(quick) {
   var basePath = '/home/johnkim/Documents/svn/working/static/debug/marketing-static/crm/pc/js'
   quick.initConfig({
     //日志目录
-    logFileFolder: "_logs",
+    logFileFolder: "/tmp/_logs",
     //构建配置
     build: {
-      path: basePath + "/static/page",
+      path: basePath + "/static",
       filter: /^(node_modules|jquery|seajs|logs)$/i
     }
   });
