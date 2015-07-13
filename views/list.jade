@@ -4,6 +4,7 @@ block append style
   style.
     #box{
       display:inline-block;
+      margin-bottom:20px;
     }
     .item .arrow-up {
       width: 0px;
@@ -55,29 +56,53 @@ block append style
         width: 100%;
         height: 400px;
     }
+    label{
+      margin-left:15px;
+    }
+    form{
+      margin:10px 0;
+    }
 
 
 block content
   .row.marketing
     p
       span.glyphicon.glyphicon-th-list
-      |  可构建的组件
-    div#box
-      each val,index in list
-        .item(data-name='#{val}')
-          | #{val}
-          span.arrow-up.hidden
-          span.arrow-text.hidden √
-    p
+      |  可构建的组件 
+
       div.checkbox
         .checkbox
           label
             input#checkAll(type='checkbox')
             |  全选
+    div#box
+      each val,index in queue
+        .item(data-name='#{val}')
+          | #{val}
+          span.arrow-up.hidden
+          span.arrow-text.hidden √
 
-      button#startbtn.btn.btn-primary
+    form.form-inline.clearfix
+      .form-group
+        label.sr-only(for="ideading") 前缀
+        input#ideading.form-control(name='ideading' placeholder='请输入模块前缀' required)
+      .checkbox
+        label
+          input#uglify(type='checkbox' checked)
+          |  压缩
+      .checkbox
+        label
+          input#mislead(type='checkbox' checked)
+          |  混淆
+      .checkbox
+        label
+          input#moreLog(type='checkbox')
+          |  输出详细日志
+
+      button#startbtn.btn.btn-primary.pull-right(type='button')
         span.glyphicon.glyphicon-heart
         |   开始构建
+
     p
       span.glyphicon.glyphicon-eye-open
       |  进度
@@ -101,7 +126,9 @@ block append script
       var bar = $('#progress-bar');
       var barText = bar.find('.text');
       var socket = window.socket;
-      var all = "#{list}".split(',');
+      var all = "#{queue}".split(',');
+      var inf = "#{inf}";
+      var outf = "#{outf}";
 
       box.on('click','.item',function(){
         var self = $(this);
@@ -135,29 +162,44 @@ block append script
       });
       startbtn.on('click',function(){
         var gallerys = getChecked();
+        var ideading = $('#ideading').val();
+        var moreLog = $('#moreLog').is(':checked');
+        var uglify = $('#uglify').is(':checked');
+        var mislead = $('#mislead').is(':checked');
+
         if(gallerys.length<=0){
           dialog.show({
             msg:'哥哥，请选择需要构建的组件！'
           });
           return;
         }
+        if($.trim(ideading)==''){
+          dialog.show({
+            msg:'哥哥，请输入模块前缀！'
+          });
+          return;
+        }
+
+        //设置总进度
+        bar.attr('aria-valuenow',gallerys.length).attr('aria-valuemax',gallerys.length).removeClass('progress-bar-success');
+
         editor.setValue('');
         socket.emit('start',{
-          path:'#{path}',
+          inf:inf,
+          outf:outf,
           dirs:gallerys,
-          all:all,
-          cfg:{
-            skipError:true
-          }
+          moreLog:moreLog,
+          mislead:mislead,
+          uglify:uglify,
+          ideading:ideading
         });
       });
-
 
       var editor = ace.edit("message");
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode('ace/mode/markdown');
             editor.getSession().setUseWrapMode(true);//自动换行
-            //editor.setReadOnly(true);
+            editor.setReadOnly(true);
             //editor.setHighlightActiveLine(false);
             editor.setShowPrintMargin(false);
 
@@ -170,14 +212,10 @@ block append script
         outLog(log,false);
       });
 
-      socket.on('build-end',function(log){
+      socket.on('done',function(log){
         outLog(log,true);
       });
 
-      //设置总进度
-      socket.on('build-length',function(length){
-        bar.attr('aria-valuenow',length).attr('aria-valuemax',length).removeClass('progress-bar-success');
-      });
       //更新当前进度
       socket.on('build-number',function(length){
         var total = parseInt(bar.attr('aria-valuenow'));

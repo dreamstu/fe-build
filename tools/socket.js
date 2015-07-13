@@ -1,5 +1,6 @@
 var path = require('path');
-var appcfg = require('../configs/app-cfg');
+var settings = require('./settings');
+
 var getColor=function(){
   var colors = ['aliceblue','antiquewhite','aqua','aquamarine','pink','red','green',
                 'orange','blue','blueviolet','brown','burlywood','cadetblue'];
@@ -10,10 +11,6 @@ var getTime=function(){
   return date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
 };
 
-function getRealPath(project){
-  return path.join(__dirname,'..',appcfg.procfg,appcfg.procfgs[project],project)+'.js';
-}
-
 module.exports = {
   start: function(io) {
     //设置日志级别
@@ -22,10 +19,31 @@ module.exports = {
       socket.emit('open'); //通知客户端已连接
       socket.emit('init','> 初始化完成,待就绪\r\n');
       socket.on('start', function(obj) {
-        //设置配置文件
-        var build = require('../tools/lib/build')(socket);
-        build.setConfig(getRealPath(obj.path));
-        build.main(obj.all,obj.dirs,obj.cfg);
+        //重写打印日志
+        settings.printLog = function(){
+          socket.emit('message',Array.prototype.join.call(arguments,''));
+        }
+        //通知客户端剩余数量
+        settings.process = function(len){
+          socket.emit('build-number',len-1);
+        }
+        //构建完毕触发
+        settings.done = function(){
+          socket.emit('done','已经全部构建完成！');
+        }
+
+        var build = require('quick-build-core')(settings);
+        //构造可选参数
+        var params = {
+          inf:obj.inf,
+          outf:obj.outf,
+          queue:obj.dirs,
+          moreLog:obj.moreLog,
+          mislead:obj.mislead,
+          uglify:obj.uglify,
+          id:obj.ideading
+        };
+        build.start(params);
       });
 
       // 构造客户端对象

@@ -6,11 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
-var queries = require('./routes/queries');
 var clis = require('./routes/cli');
-var config = require('./routes/config');
-var others = require('./routes/others');
 var app = express();
 
 // view engine setup
@@ -26,11 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
-app.use('/query', queries);
 app.use('/cli',clis);
-app.use('/config',config);
-app.use('/others',others);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
