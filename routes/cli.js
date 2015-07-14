@@ -10,7 +10,7 @@ router.post('/list', function(req, res, next) {
   var outf = req.body.outf;
   build.getQueue(inf,function(err,queue){
     if(err){
-      res.render('error', { message: '抱歉，不能正确获取待构建组建列表信息',error:{status:'500',stack:err}});
+      res.render('error', { message: '抱歉，不能正确获取待构建组件列表信息',error:{status:'500',stack:err}});
     }else{
       res.render('list', { 
         title: '构建-前端自动化',
@@ -21,9 +21,5 @@ router.post('/list', function(req, res, next) {
     }
   });
 });
-
-function formatPath(path){
-  return path.replace(/\\/g,'/');
-}
 
 module.exports = router;

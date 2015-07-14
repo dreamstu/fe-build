@@ -24,8 +24,8 @@ module.exports = {
           socket.emit('message',Array.prototype.join.call(arguments,''));
         }
         //通知客户端剩余数量
-        settings.process = function(len){
-          socket.emit('build-number',len-1);
+        settings.process = function(name){
+          socket.emit('build-number',name);
         }
         //构建完毕触发
         settings.done = function(){

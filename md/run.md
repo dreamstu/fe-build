@@ -1,0 +1,11 @@
+#使用SeaJs加载你的模块
+编写好了自己的模块是不是很鸡冻呢，表着急，下面跟着我慢慢来～
+
+## 关于SeaJs
+使用seajs前，你有必要了解一下关于SeaJs的一些事情。
+
+baidu百科一下：
+```
+SeaJS是一个遵循CommonJS规范的JavaScript模块加载框架，可以实现JavaScript的模块化开发及加载机制。与jQuery等JavaScript框架不同，SeaJS不会扩展封装语言特性，而只是实现JavaScript的模块化及按模块加载。SeaJS的主要目的是令JavaScript开发模块化并可以轻松愉悦进行加载，将前端工程师从繁重的JavaScript文件及对象依赖处理中解放出来，可以专注于代码本身的逻辑。SeaJS可以与jQuery这类框架完美集成。使用SeaJS可以提高JavaScript代码的可读性和清晰度，解决目前JavaScript编程中普遍存在的依赖关系混乱和代码纠缠等问题，方便代码的编写和维护。
+```
+到这，你应该知道了seajs是用来干什么的？

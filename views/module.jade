@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	.row.marketing
+		#preview.col-lg-12
+
+block append script
+	script(src="/javascripts/markdown.js")
+	script#md(type='text/html').
+		#{content}
+	script.
+		 document.getElementById('preview').innerHTML=marked(document.getElementById('md').innerHTML);

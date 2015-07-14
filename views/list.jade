@@ -19,10 +19,10 @@ block append style
     }
     .item .arrow-text{
       position: absolute;
-      right: 2px;
+      right: 1px;
       height: 20px;
       z-index: 1;
-      top: 5px;
+      top: 2px;
       color:#fff;
     }
     .item.active{
@@ -62,7 +62,9 @@ block append style
     form{
       margin:10px 0;
     }
-
+    .mr10{
+      margin-right:10px;
+    }
 
 block content
   .row.marketing
@@ -99,9 +101,13 @@ block content
           input#moreLog(type='checkbox')
           |  输出详细日志
 
-      button#startbtn.btn.btn-primary.pull-right(type='button')
-        span.glyphicon.glyphicon-heart
-        |   开始构建
+      p.pull-right
+        button#backbtn.btn.btn-primary.mr10(type='button')
+          span.glyphicon.glyphicon-arrow-left
+          |   返回修改路径
+        button#startbtn.btn.btn-primary(type='button')
+          span.glyphicon.glyphicon-heart
+          |   开始构建
 
     p
       span.glyphicon.glyphicon-eye-open
@@ -122,6 +128,7 @@ block append script
    $(function(){
       var box = $('#box');
       var startbtn = $('#startbtn');
+      var backbtn = $('#backbtn');
       var checkAll = $('#checkAll');
       var bar = $('#progress-bar');
       var barText = bar.find('.text');
@@ -160,6 +167,10 @@ block append script
           });
         }
       });
+      backbtn.on('click',function(){
+        window.history.back();
+      });
+
       startbtn.on('click',function(){
         var gallerys = getChecked();
         var ideading = $('#ideading').val();
@@ -179,6 +190,8 @@ block append script
           });
           return;
         }
+        //禁用按钮，直到任务执行完成
+        $(this).attr('disabled','disabled');
 
         //设置总进度
         bar.attr('aria-valuenow',gallerys.length).attr('aria-valuemax',gallerys.length).removeClass('progress-bar-success');
@@ -214,12 +227,20 @@ block append script
 
       socket.on('done',function(log){
         outLog(log,true);
+        startbtn.removeAttr('disabled');
       });
-
+      
+      var sy;
       //更新当前进度
-      socket.on('build-number',function(length){
+      socket.on('build-number',function(name){
+        outLog('组件：'+name+'已构建。',false);
         var total = parseInt(bar.attr('aria-valuenow'));
-        var progress = total-length;
+        if(!sy){
+          sy = total-1;
+        }else{
+          sy--;
+        }
+        var progress = total-sy;
         var percent = Math.ceil((progress/total)*100);
         bar.css({"width":percent+"%"});
         barText.text(percent+'%');

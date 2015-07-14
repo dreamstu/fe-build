@@ -1,5 +1,5 @@
 .header
   ul.nav.nav-pills.pull-right
-    each obj in [{"url":"/","name":"首页"},{"url":"/tool","name":"构建"},{"url":"/about","name":"关于"}]
-      li.active: a(href='#{obj.url}') #{obj.name}
+    each obj in [{"url":"/","name":"首页"},{"url":"/tool","name":"构建"},{"url":"/preview/home","name":"开始使用"},{"url":"/about","name":"关于"}]
+      li: a(href='#{obj.url}') #{obj.name}
   h3.text-muted 前端自动化
