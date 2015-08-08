@@ -9,4 +9,43 @@ block append script
 	script#md(type='text/html').
 		#{content}
 	script.
-		 document.getElementById('preview').innerHTML=marked(document.getElementById('md').innerHTML);
+		js = {lang:{}};
+		js.lang.String = function() {
+			this.REGX_HTML_ENCODE = /"|&|'|<|>|[\x00-\x20]|[\x7F-\xFF]|[\u0100-\u2700]/g;
+			this.REGX_HTML_DECODE = /&\w+;|&#(\d+);/g;
+			this.REGX_TRIM = /(^\s*)|(\s*$)/g;
+			this.HTML_DECODE = {
+				"&lt;": "<",
+				"&gt;": ">",
+				"&amp;": "&",
+				"&nbsp;": " ",
+				"&quot;": "\"",
+				"©": ""
+				// Add more
+			};
+			this.decodeHtml = function(s) {
+				var HTML_DECODE = this.HTML_DECODE;
+				s = (s != undefined) ? s: this.toString();
+				return (typeof s != "string") ? s: s.replace(this.REGX_HTML_DECODE,
+				function($0, $1) {
+					var c = HTML_DECODE[$0];
+					if (c == undefined) {
+						// Maybe is Entity Number
+						if (!isNaN($1)) {
+							c = String.fromCharCode(($1 == 160) ? 32 : $1);
+						} else {
+							c = $0;
+						}
+					}
+					return c;
+				});
+			};
+
+		};
+
+		js.lang.String.call(String.prototype);
+		marked.setOptions({
+			sanitize:true,
+			smartypants:true
+		});
+		 document.getElementById('preview').innerHTML=marked(document.getElementById('md').innerText.decodeHtml());

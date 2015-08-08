@@ -18,10 +18,7 @@ router.get('/about', function(req, res, next) {
 
 router.get('/preview/:md', function(req, res, next) {
 	var mdPath = req.params.md;
-	console.log(11111+'==='+req.params.md);
-	var md = fs.readFileSync(path.join(__dirname, '..', '/md/', mdPath)+'.md', {
-    	encoding: 'utf8'
-    });
+	var md = fs.readFileSync(path.join(__dirname, '..', '/md/', mdPath)+'.md');
     res.render('module', { title: '模块编写－前端自动化',content:md});
 });
 

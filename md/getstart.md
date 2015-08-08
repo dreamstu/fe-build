@@ -30,11 +30,13 @@ touch index.js
 
 - 用你准备好的编辑器打开这个JS文件，并且写入：
 ```
+// 所有模块都通过 define 来定义
 define('hello/index', function(require, exports, module) {
 	var _ = {};
 	_.sayHello = function(){
 		alert('hello');
 	};
+	// 或者通过 module.exports 提供整个接口
 	module.exports = _;
 });
 ```
@@ -60,12 +62,13 @@ touch index.js
 - 用你准备好的编辑器打开这个JS文件，并且写入：
 ```
 define('robot/index', function(require, exports, module) {
+	// 通过 require 引入依赖
 	var say = require('hello/index');
 	
 	//some code ....
 
 	say.sayHello();
-
+	
 	//你可以像hello/index模块那样做，向外提供一些接口。
 	//module.exports = ...;
 });
